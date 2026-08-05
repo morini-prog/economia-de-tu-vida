@@ -625,7 +625,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 userAvatar.textContent = 'D';
                 userAvatar.style.background = 'linear-gradient(135deg, #b45309, #d97706)'; // Amber theme
                 profileEmail.textContent = 'Docente Administrador';
-                profileRole.textContent = 'Docencia (2228)';
+                profileRole.textContent = 'Docente';
                 
                 // Show docente tabs
                 docButtons.forEach(btn => btn && btn.classList.remove('hidden'));
