@@ -42,6 +42,9 @@
                 <button class="tab-btn" data-tab="tab-glosario" id="btn-tab-glosario">
                     <i data-lucide="book-open"></i> Glosario
                 </button>
+                <button class="tab-btn hidden" data-tab="tab-docente" id="btn-tab-docente">
+                    <i data-lucide="graduation-cap"></i> Docente
+                </button>
             </nav>
 
             <div class="header-actions">
@@ -49,6 +52,22 @@
                     <i data-lucide="moon" class="icon-moon"></i>
                     <i data-lucide="sun" class="icon-sun"></i>
                 </button>
+                
+                <!-- Auth Section in Header -->
+                <button class="auth-btn" id="headerAuthBtn">
+                    <i data-lucide="log-in"></i> Acceso
+                </button>
+                <div class="user-profile-menu hidden" id="userProfileMenu">
+                    <span class="user-avatar" id="userAvatar">E</span>
+                    <div class="profile-dropdown" id="profileDropdown">
+                        <p class="profile-email" id="profileEmail">correo@gmail.com</p>
+                        <p class="profile-role" id="profileRole">Estudiante</p>
+                        <button class="dropdown-item" id="logoutBtn">
+                            <i data-lucide="log-out"></i> Cerrar Sesión
+                        </button>
+                    </div>
+                </div>
+
                 <button class="mobile-menu-toggle" id="mobileMenuBtn" aria-label="Menú">
                     <i data-lucide="menu"></i>
                 </button>
@@ -61,6 +80,7 @@
             <button class="mobile-tab-btn" data-tab="tab-20-30">20 a 30 Años</button>
             <button class="mobile-tab-btn" data-tab="tab-30-50">30 a 50 Años</button>
             <button class="mobile-tab-btn" data-tab="tab-glosario">Glosario</button>
+            <button class="mobile-tab-btn hidden" data-tab="tab-docente" id="btn-mobile-tab-docente">Docente</button>
         </nav>
     </header>
 
@@ -266,6 +286,18 @@
 
             <!-- Quiz Section Pestaña 2 -->
             <div class="quiz-container" id="quiz-20-30">
+                <!-- Lock Blocker -->
+                <div class="quiz-blocker" id="blocker-quiz2">
+                    <div class="blocker-content">
+                        <i data-lucide="lock" class="lock-icon"></i>
+                        <h4>Autoevaluación Bloqueada</h4>
+                        <p>Inicia sesión con tu cuenta de Google (Gmail) para desbloquear este cuestionario y registrar tu calificación.</p>
+                        <button class="cta-btn primary-btn btn-login-trigger">
+                            <i data-lucide="log-in"></i> Iniciar Sesión con Google
+                        </button>
+                    </div>
+                </div>
+
                 <div class="quiz-header">
                     <i data-lucide="check-square"></i>
                     <h3>Autoevaluación: Etapa de 20 a 30 años</h3>
@@ -419,6 +451,18 @@
 
             <!-- Quiz Section Pestaña 3 -->
             <div class="quiz-container" id="quiz-30-50">
+                <!-- Lock Blocker -->
+                <div class="quiz-blocker" id="blocker-quiz3">
+                    <div class="blocker-content">
+                        <i data-lucide="lock" class="lock-icon"></i>
+                        <h4>Autoevaluación Bloqueada</h4>
+                        <p>Inicia sesión con tu cuenta de Google (Gmail) para desbloquear este cuestionario y registrar tu calificación.</p>
+                        <button class="cta-btn primary-btn btn-login-trigger">
+                            <i data-lucide="log-in"></i> Iniciar Sesión con Google
+                        </button>
+                    </div>
+                </div>
+
                 <div class="quiz-header">
                     <i data-lucide="check-square"></i>
                     <h3>Autoevaluación: Etapa de 30 a 50 años</h3>
@@ -625,6 +669,18 @@
 
             <!-- Quiz Section Pestaña 4 -->
             <div class="quiz-container" id="quiz-glosario">
+                <!-- Lock Blocker -->
+                <div class="quiz-blocker" id="blocker-quiz4">
+                    <div class="blocker-content">
+                        <i data-lucide="lock" class="lock-icon"></i>
+                        <h4>Autoevaluación Bloqueada</h4>
+                        <p>Inicia sesión con tu cuenta de Google (Gmail) para desbloquear este cuestionario y registrar tu calificación.</p>
+                        <button class="cta-btn primary-btn btn-login-trigger">
+                            <i data-lucide="log-in"></i> Iniciar Sesión con Google
+                        </button>
+                    </div>
+                </div>
+
                 <div class="quiz-header">
                     <i data-lucide="check-square"></i>
                     <h3>Autoevaluación: Glosario Financiero</h3>
@@ -672,6 +728,70 @@
                     <p class="result-message"></p>
                     <span class="final-score">Puntaje Final: 2 / 2</span>
                 </div>
+        </section>
+
+        <!-- PESTAÑA 5: PANEL DOCENTE -->
+        <section id="tab-docente" class="tab-section">
+            <div class="section-header">
+                <span class="stage-tag">Administración & Reportes</span>
+                <h2>Panel del Docente</h2>
+                <p class="section-intro">Supervisa el progreso del aula, filtra calificaciones y descarga reportes de tus alumnos.</p>
+            </div>
+
+            <div class="docente-dashboard-card">
+                <div class="dashboard-controls">
+                    <div class="search-input-wrapper">
+                        <i data-lucide="search" class="search-icon"></i>
+                        <input type="text" id="studentSearch" placeholder="Buscar por Gmail del alumno...">
+                    </div>
+                    <div class="control-buttons">
+                        <button class="cta-btn secondary-btn" id="exportCsvBtn">
+                            <i data-lucide="download"></i> Exportar CSV
+                        </button>
+                        <button class="cta-btn delete-btn" id="resetDatabaseBtn">
+                            <i data-lucide="trash-2"></i> Reiniciar Registros
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Statistics Panel -->
+                <div class="stats-panel">
+                    <div class="stat-box">
+                        <span class="stat-label">Alumnos Registrados</span>
+                        <span class="stat-number" id="stat-total-students">0</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-label">Evaluaciones Completas</span>
+                        <span class="stat-number" id="stat-total-completed">0</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-label">Puntaje Promedio</span>
+                        <span class="stat-number" id="stat-average-score">0%</span>
+                    </div>
+                </div>
+
+                <!-- Table -->
+                <div class="table-container">
+                    <table class="students-table" id="studentsTable">
+                        <thead>
+                            <tr>
+                                <th>Estudiante (Gmail)</th>
+                                <th>Etapa 20-30 (3 pts)</th>
+                                <th>Etapa 30-50 (3 pts)</th>
+                                <th>Glosario (2 pts)</th>
+                                <th>Puntaje Total (8 pts)</th>
+                                <th>Última Actividad</th>
+                            </tr>
+                        </thead>
+                        <tbody id="studentsTableBody">
+                            <!-- Dynamic student rows -->
+                        </tbody>
+                    </table>
+                    <div class="no-records-message hidden" id="noRecordsMsg">
+                        <i data-lucide="database"></i>
+                        <p>No se encontraron registros de estudiantes.</p>
+                    </div>
+                </div>
             </div>
         </section>
 
@@ -684,6 +804,96 @@
             <p>Diseño premium para divulgación y educación financiera interactiva.</p>
         </div>
     </footer>
+
+    <!-- Modal de Autenticación -->
+    <div class="modal-overlay hidden" id="loginModal">
+        <div class="modal-card">
+            <button class="modal-close" id="closeLoginModalBtn"><i data-lucide="x"></i></button>
+            <div class="modal-header">
+                <h3 id="modalTitle">Ingreso al Sistema</h3>
+                <p>Elige tu rol para ingresar</p>
+            </div>
+            <!-- Role Selector -->
+            <div class="role-selector-tabs">
+                <button class="role-tab active" data-role="estudiante" id="role-tab-estudiante">
+                    <i data-lucide="user"></i> Estudiante
+                </button>
+                <button class="role-tab" data-role="docente" id="role-tab-docente">
+                    <i data-lucide="graduation-cap"></i> Docente
+                </button>
+            </div>
+            
+            <!-- Estudiante Form -->
+            <div class="auth-form-content" id="form-estudiante">
+                <p class="auth-desc">Accede para realizar los cuestionarios y registrar tus calificaciones en la base de datos.</p>
+                <button class="google-sign-in-btn" id="googleSignInBtn">
+                    <svg class="google-icon" viewBox="0 0 24 24" width="20" height="20">
+                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                    </svg>
+                    <span>Iniciar sesión con Google (Gmail)</span>
+                </button>
+            </div>
+            
+            <!-- Docente Form -->
+            <div class="auth-form-content hidden" id="form-docente">
+                <p class="auth-desc">Introduce la clave de acceso de docente para ingresar al panel de control.</p>
+                <div class="input-group">
+                    <label for="docentePassword">Clave de Acceso</label>
+                    <div class="password-input-wrapper">
+                        <input type="password" id="docentePassword" placeholder="Introduce la contraseña (2228)...">
+                        <button type="button" class="toggle-password" id="togglePasswordBtn" aria-label="Mostrar contraseña">
+                            <i data-lucide="eye"></i>
+                        </button>
+                    </div>
+                    <span class="error-message hidden" id="loginErrorMessage">Contraseña incorrecta. Inténtalo de nuevo.</span>
+                </div>
+                <button class="cta-btn primary-btn w-full justify-center" id="docenteSubmitBtn">
+                    Ingresar como Docente
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de flujo Google Sign-in Realista -->
+    <div class="modal-overlay hidden" id="googleModal">
+        <div class="google-login-card">
+            <div class="google-logo">
+                <svg viewBox="0 0 24 24" width="24" height="24">
+                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                </svg>
+                <span>Google</span>
+            </div>
+            <div class="google-card-header">
+                <h2>Acceder</h2>
+                <p>con tu cuenta de Google</p>
+            </div>
+            <div class="google-input-group" id="google-email-step">
+                <input type="email" id="googleEmailInput" placeholder="Correo electrónico o teléfono" required>
+                <div class="google-input-footer">
+                    <a href="#" onclick="return false;">¿Olvidaste el correo electrónico?</a>
+                    <p>¿No es tu computadora? Usa el modo de navegación privada para acceder. <a href="#" onclick="return false;">Más información</a></p>
+                </div>
+                <div class="google-input-group-row">
+                    <!-- Create account spacer -->
+                    <span class="create-account-text">Crear cuenta</span>
+                    <button class="google-blue-btn" id="googleNextBtn">Siguiente</button>
+                </div>
+                <div class="google-action-row" style="margin-top: 12px; display: flex; justify-content: flex-end;">
+                    <button class="google-text-btn" id="googleCancelBtn">Cancelar</button>
+                </div>
+            </div>
+            <div class="google-loading-step hidden" id="google-loading-step">
+                <div class="google-spinner"></div>
+                <p>Iniciando sesión...</p>
+            </div>
+        </div>
+    </div>
 
     <!-- App JavaScript -->
     <script src="app.js"></script>

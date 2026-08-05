@@ -2,7 +2,90 @@ document.addEventListener('DOMContentLoaded', () => {
     // 1. Initialize Lucide Icons
     lucide.createIcons();
 
-    // 2. Tab Navigation Logic
+    // ==========================================
+    // DATABASE MANAGER (LocalStorage & Seeds)
+    // ==========================================
+    class DatabaseManager {
+        static STORAGE_KEY = 'economia_vida_database';
+
+        static getStudents() {
+            const data = localStorage.getItem(this.STORAGE_KEY);
+            if (!data) {
+                return this.initSeeds();
+            }
+            return JSON.parse(data);
+        }
+
+        static initSeeds() {
+            const seeds = [
+                {
+                    email: 'sofia.gomez@gmail.com',
+                    scores: { quiz2: 3, quiz3: 3, quizGlosario: 2 },
+                    lastActive: new Date(Date.now() - 3600000 * 2).toISOString() // 2 hours ago
+                },
+                {
+                    email: 'juan.perez@gmail.com',
+                    scores: { quiz2: 2, quiz3: 2, quizGlosario: 1 },
+                    lastActive: new Date(Date.now() - 3600000 * 24).toISOString() // 24 hours ago
+                },
+                {
+                    email: 'belen.bulat@gmail.com',
+                    scores: { quiz2: 1, quiz3: null, quizGlosario: 2 },
+                    lastActive: new Date().toISOString() // now
+                },
+                {
+                    email: 'mateo.finanzas@gmail.com',
+                    scores: { quiz2: 3, quiz3: 1, quizGlosario: null },
+                    lastActive: new Date(Date.now() - 3600000 * 5).toISOString() // 5 hours ago
+                }
+            ];
+            localStorage.setItem(this.STORAGE_KEY, JSON.stringify(seeds));
+            return seeds;
+        }
+
+        static saveStudent(email) {
+            const students = this.getStudents();
+            const exists = students.find(s => s.email.toLowerCase() === email.toLowerCase());
+            if (!exists) {
+                students.push({
+                    email: email,
+                    scores: { quiz2: null, quiz3: null, quizGlosario: null },
+                    lastActive: new Date().toISOString()
+                });
+                localStorage.setItem(this.STORAGE_KEY, JSON.stringify(students));
+            }
+        }
+
+        static updateScore(email, quizId, score) {
+            const students = this.getStudents();
+            const student = students.find(s => s.email.toLowerCase() === email.toLowerCase());
+            if (student) {
+                student.scores[quizId] = score;
+                student.lastActive = new Date().toISOString();
+                localStorage.setItem(this.STORAGE_KEY, JSON.stringify(students));
+            } else {
+                students.push({
+                    email: email,
+                    scores: { quiz2: null, quiz3: null, quizGlosario: null, [quizId]: score },
+                    lastActive: new Date().toISOString()
+                });
+                localStorage.setItem(this.STORAGE_KEY, JSON.stringify(students));
+            }
+        }
+
+        static reset() {
+            localStorage.removeItem(this.STORAGE_KEY);
+            return this.initSeeds();
+        }
+    }
+
+    // Expose DatabaseManager globally if needed
+    window.DatabaseManager = DatabaseManager;
+
+
+    // ==========================================
+    // TAB NAVIGATION LOGIC (including Docente)
+    // ==========================================
     const tabButtons = document.querySelectorAll('.tab-btn');
     const mobileTabButtons = document.querySelectorAll('.mobile-tab-btn');
     const sections = document.querySelectorAll('.tab-section');
@@ -11,6 +94,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Function to switch tabs
     window.switchTab = function(tabId) {
+        // Secure tab check for Teacher panel
+        if (tabId === 'tab-docente') {
+            const userJson = localStorage.getItem('economy_vida_user');
+            if (!userJson) {
+                switchTab('tab-inicio');
+                openLoginModal();
+                return;
+            }
+            const user = JSON.parse(userJson);
+            if (user.role !== 'docente') {
+                switchTab('tab-inicio');
+                return;
+            }
+            // If they are teacher, render the dashboard
+            refreshDocenteDashboard();
+        }
+
         // Update Desktop Tabs
         tabButtons.forEach(btn => {
             if (btn.getAttribute('data-tab') === tabId) {
@@ -69,7 +169,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
 
-    // 3. Theme Toggle Logic (Light / Dark Mode)
+    // ==========================================
+    // THEME TOGGLE LOGIC (Light / Dark Mode)
+    // ==========================================
     const themeToggleBtn = document.getElementById('themeToggleBtn');
     const currentTheme = localStorage.getItem('theme') || 'light';
 
@@ -85,7 +187,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
 
-    // 4. Glossary Accordion & Search Logic
+    // ==========================================
+    // GLOSSARY ACCORDION & SEARCH LOGIC
+    // ==========================================
     const accordionItems = document.querySelectorAll('.accordion-item');
     const glossarySearch = document.getElementById('glossarySearch');
 
@@ -134,14 +238,17 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
 
-    // 5. Reusable Quiz Engine
+    // ==========================================
+    // REUSABLE QUIZ ENGINE
+    // ==========================================
     class QuizEngine {
-        constructor(containerId, nextBtnId, restartBtnId, progressBarId, resultCardId) {
+        constructor(containerId, nextBtnId, restartBtnId, progressBarId, resultCardId, dataField) {
             this.container = document.getElementById(containerId);
             this.nextBtn = document.getElementById(nextBtnId);
             this.restartBtn = document.getElementById(restartBtnId);
             this.progressBar = document.getElementById(progressBarId);
             this.resultCard = document.getElementById(resultCardId);
+            this.dataField = dataField;
             
             this.questions = this.container.querySelectorAll('.question-block');
             this.scoreText = this.container.querySelector('.current-score');
@@ -273,6 +380,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 resultMsg.innerHTML = "<strong>¡Sigue practicando!</strong> Cometer errores es parte de aprender. Te invitamos a leer con calma las secciones y volver a intentar el test para dominar estas herramientas.";
             }
 
+            // Database Save Hook
+            const userJson = localStorage.getItem('economy_vida_user');
+            if (userJson) {
+                const user = JSON.parse(userJson);
+                if (user.role === 'estudiante') {
+                    DatabaseManager.updateScore(user.email, this.dataField, this.score);
+                    
+                    // Live refresh of Docente panel if currently visible
+                    const docenteSection = document.getElementById('tab-docente');
+                    if (docenteSection.classList.contains('active-section')) {
+                        refreshDocenteDashboard();
+                    }
+                }
+            }
+
             // Hide Next Button, Show Restart Button
             this.nextBtn.classList.add('hidden');
             this.restartBtn.classList.remove('hidden');
@@ -320,7 +442,405 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Instantiate Quizzes
-    const quizEtapa1 = new QuizEngine('quiz-20-30', 'next-btn-quiz2', 'restart-btn-quiz2', 'progress-quiz2', 'result-quiz2');
-    const quizEtapa2 = new QuizEngine('quiz-30-50', 'next-btn-quiz3', 'restart-btn-quiz3', 'progress-quiz3', 'result-quiz3');
-    const quizGlosario = new QuizEngine('quiz-glosario', 'next-btn-quiz4', 'restart-btn-quiz4', 'progress-quiz4', 'result-quiz4');
+    const quizEtapa1 = new QuizEngine('quiz-20-30', 'next-btn-quiz2', 'restart-btn-quiz2', 'progress-quiz2', 'result-quiz2', 'quiz2');
+    const quizEtapa2 = new QuizEngine('quiz-30-50', 'next-btn-quiz3', 'restart-btn-quiz3', 'progress-quiz3', 'result-quiz3', 'quiz3');
+    const quizGlosario = new QuizEngine('quiz-glosario', 'next-btn-quiz4', 'restart-btn-quiz4', 'progress-quiz4', 'result-quiz4', 'quizGlosario');
+
+
+    // ==========================================
+    // AUTHENTICATION SYSTEM (Students & Docente)
+    // ==========================================
+    const loginModal = document.getElementById('loginModal');
+    const headerAuthBtn = document.getElementById('headerAuthBtn');
+    const closeLoginModalBtn = document.getElementById('closeLoginModalBtn');
+    
+    const roleTabEstudiante = document.getElementById('role-tab-estudiante');
+    const roleTabDocente = document.getElementById('role-tab-docente');
+    const formEstudiante = document.getElementById('form-estudiante');
+    const formDocente = document.getElementById('form-docente');
+
+    const googleModal = document.getElementById('googleModal');
+    const googleSignInBtn = document.getElementById('googleSignInBtn');
+    const googleCancelBtn = document.getElementById('googleCancelBtn');
+    const googleNextBtn = document.getElementById('googleNextBtn');
+    const googleEmailInput = document.getElementById('googleEmailInput');
+    const googleEmailStep = document.getElementById('google-email-step');
+    const googleLoadingStep = document.getElementById('google-loading-step');
+
+    const docentePassword = document.getElementById('docentePassword');
+    const togglePasswordBtn = document.getElementById('togglePasswordBtn');
+    const docenteSubmitBtn = document.getElementById('docenteSubmitBtn');
+    const loginErrorMessage = document.getElementById('loginErrorMessage');
+
+    const userProfileMenu = document.getElementById('userProfileMenu');
+    const userAvatar = document.getElementById('userAvatar');
+    const logoutBtn = document.getElementById('logoutBtn');
+
+    // Open/Close Auth Modal
+    function openLoginModal() {
+        loginModal.classList.remove('hidden');
+        resetLoginForm();
+    }
+
+    function closeLoginModal() {
+        loginModal.classList.add('hidden');
+    }
+
+    headerAuthBtn.addEventListener('click', openLoginModal);
+    closeLoginModalBtn.addEventListener('click', closeLoginModal);
+
+    // Lock screen trigger buttons inside quizzes
+    document.querySelectorAll('.btn-login-trigger').forEach(btn => {
+        btn.addEventListener('click', openLoginModal);
+    });
+
+    // Toggle Role Form
+    function setRole(role) {
+        if (role === 'estudiante') {
+            roleTabEstudiante.classList.add('active');
+            roleTabDocente.classList.remove('active');
+            formEstudiante.classList.remove('hidden');
+            formDocente.classList.add('hidden');
+        } else {
+            roleTabEstudiante.classList.remove('active');
+            roleTabDocente.classList.add('active');
+            formEstudiante.classList.add('hidden');
+            formDocente.classList.remove('hidden');
+        }
+    }
+
+    roleTabEstudiante.addEventListener('click', () => setRole('estudiante'));
+    roleTabDocente.addEventListener('click', () => setRole('docente'));
+
+    // Reset login form fields
+    function resetLoginForm() {
+        docentePassword.value = '';
+        loginErrorMessage.classList.add('hidden');
+        setRole('estudiante');
+    }
+
+    // Toggle Password Visibility
+    togglePasswordBtn.addEventListener('click', () => {
+        const type = docentePassword.getAttribute('type') === 'password' ? 'text' : 'password';
+        docentePassword.setAttribute('type', type);
+        
+        // Toggle icon
+        const icon = togglePasswordBtn.querySelector('i');
+        if (type === 'text') {
+            icon.setAttribute('data-lucide', 'eye-off');
+        } else {
+            icon.setAttribute('data-lucide', 'eye');
+        }
+        lucide.createIcons();
+    });
+
+    // Submit Teacher Password
+    docenteSubmitBtn.addEventListener('click', () => {
+        const password = docentePassword.value.trim();
+        if (password === '2228') {
+            // Success
+            loginErrorMessage.classList.add('hidden');
+            closeLoginModal();
+            
+            const teacherUser = { email: 'docente@colegio.edu.ar', role: 'docente' };
+            localStorage.setItem('economy_vida_user', JSON.stringify(teacherUser));
+            
+            checkLoginState();
+            switchTab('tab-docente');
+        } else {
+            loginErrorMessage.classList.remove('hidden');
+        }
+    });
+
+    // Enter key support for password field
+    docentePassword.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            docenteSubmitBtn.click();
+        }
+    });
+
+    // Google Login Flow
+    googleSignInBtn.addEventListener('click', () => {
+        closeLoginModal();
+        googleModal.classList.remove('hidden');
+        googleEmailInput.value = '';
+        googleEmailStep.classList.remove('hidden');
+        googleLoadingStep.classList.add('hidden');
+    });
+
+    googleCancelBtn.addEventListener('click', () => {
+        googleModal.classList.add('hidden');
+    });
+
+    googleNextBtn.addEventListener('click', () => {
+        const email = googleEmailInput.value.trim();
+        if (!email || !email.includes('@')) {
+            alert('Por favor, ingresa una dirección de correo válida (Gmail).');
+            return;
+        }
+
+        // Show loading step
+        googleEmailStep.classList.add('hidden');
+        googleLoadingStep.classList.remove('hidden');
+
+        // Simulate network latency (Google Oauth loader)
+        setTimeout(() => {
+            googleModal.classList.add('hidden');
+            
+            // Save User
+            const studentUser = { email: email, role: 'estudiante' };
+            localStorage.setItem('economy_vida_user', JSON.stringify(studentUser));
+            
+            // Add student to Database if new
+            DatabaseManager.saveStudent(email);
+            
+            checkLoginState();
+        }, 1200);
+    });
+
+    googleEmailInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            googleNextBtn.click();
+        }
+    });
+
+    // Profile Dropdown Toggle
+    userAvatar.addEventListener('click', (e) => {
+        e.stopPropagation();
+        userProfileMenu.classList.toggle('menu-active');
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!userProfileMenu.contains(e.target)) {
+            userProfileMenu.classList.remove('menu-active');
+        }
+    });
+
+    // Logout Action
+    logoutBtn.addEventListener('click', () => {
+        localStorage.removeItem('economy_vida_user');
+        userProfileMenu.classList.remove('menu-active');
+        checkLoginState();
+        switchTab('tab-inicio');
+    });
+
+
+    // ==========================================
+    // INITIAL LOGIN STATE CHECK
+    // ==========================================
+    function checkLoginState() {
+        const userJson = localStorage.getItem('economy_vida_user');
+        const docButtons = [
+            document.getElementById('btn-tab-docente'),
+            document.getElementById('btn-mobile-tab-docente')
+        ];
+        
+        const blockers = [
+            document.getElementById('blocker-quiz2'),
+            document.getElementById('blocker-quiz3'),
+            document.getElementById('blocker-quiz4')
+        ];
+
+        const profileEmail = document.getElementById('profileEmail');
+        const profileRole = document.getElementById('profileRole');
+
+        if (userJson) {
+            const user = JSON.parse(userJson);
+            
+            // Show avatar, hide login btn
+            headerAuthBtn.classList.add('hidden');
+            userProfileMenu.classList.remove('hidden');
+            
+            if (user.role === 'docente') {
+                userAvatar.textContent = 'D';
+                userAvatar.style.background = 'linear-gradient(135deg, #b45309, #d97706)'; // Amber theme
+                profileEmail.textContent = 'Docente Administrador';
+                profileRole.textContent = 'Docencia (2228)';
+                
+                // Show docente tabs
+                docButtons.forEach(btn => btn && btn.classList.remove('hidden'));
+                
+                // Unblock quizes (docente can run them for testing)
+                blockers.forEach(blk => blk && blk.classList.add('hidden'));
+            } else {
+                const initial = user.email.trim().charAt(0).toUpperCase();
+                userAvatar.textContent = initial;
+                userAvatar.style.background = 'linear-gradient(135deg, #0f766e, #0284c7)'; // Teal gradient
+                profileEmail.textContent = user.email;
+                profileRole.textContent = 'Estudiante';
+                
+                // Hide docente tabs
+                docButtons.forEach(btn => btn && btn.classList.add('hidden'));
+                
+                // Unblock quizzes
+                blockers.forEach(blk => blk && blk.classList.add('hidden'));
+            }
+        } else {
+            // Clean state
+            headerAuthBtn.classList.remove('hidden');
+            userProfileMenu.classList.add('hidden');
+            
+            // Hide docente tabs
+            docButtons.forEach(btn => btn && btn.classList.add('hidden'));
+            
+            // Block quizzes
+            blockers.forEach(blk => blk && blk.classList.remove('hidden'));
+            
+            // Redirect from Docente page if user logged out while looking at it
+            const activeSection = document.querySelector('.tab-section.active-section');
+            if (activeSection && activeSection.id === 'tab-docente') {
+                switchTab('tab-inicio');
+            }
+        }
+    }
+
+    // Run login verification at startup
+    checkLoginState();
+
+
+    // ==========================================
+    // DOCENTE DASHBOARD MANAGEMENT
+    // ==========================================
+    const studentSearch = document.getElementById('studentSearch');
+    const exportCsvBtn = document.getElementById('exportCsvBtn');
+    const resetDatabaseBtn = document.getElementById('resetDatabaseBtn');
+
+    function refreshDocenteDashboard() {
+        const students = DatabaseManager.getStudents();
+        const tableBody = document.getElementById('studentsTableBody');
+        const noRecordsMsg = document.getElementById('noRecordsMsg');
+        const query = studentSearch.value.toLowerCase().trim();
+        
+        tableBody.innerHTML = '';
+        
+        // Filter elements
+        const filtered = students.filter(s => s.email.toLowerCase().includes(query));
+        
+        if (filtered.length === 0) {
+            noRecordsMsg.classList.remove('hidden');
+        } else {
+            noRecordsMsg.classList.add('hidden');
+            
+            filtered.forEach(student => {
+                const tr = document.createElement('tr');
+                
+                const q2Badge = getScoreBadgeHtml(student.scores.quiz2, 3);
+                const q3Badge = getScoreBadgeHtml(student.scores.quiz3, 3);
+                const qgBadge = getScoreBadgeHtml(student.scores.quizGlosario, 2);
+                
+                // Sum scores
+                const totalScore = (student.scores.quiz2 || 0) + (student.scores.quiz3 || 0) + (student.scores.quizGlosario || 0);
+                const totalMax = 8;
+                
+                // Formatted date
+                const dateStr = student.lastActive ? new Date(student.lastActive).toLocaleString('es-AR', {
+                    day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
+                }) : 'Sin actividad';
+                
+                tr.innerHTML = `
+                    <td><strong>${student.email}</strong></td>
+                    <td>${q2Badge}</td>
+                    <td>${q3Badge}</td>
+                    <td>${qgBadge}</td>
+                    <td><strong>${totalScore} / ${totalMax}</strong></td>
+                    <td>${dateStr}</td>
+                `;
+                
+                tableBody.appendChild(tr);
+            });
+        }
+        
+        // Update stats
+        compileDocenteStats(students);
+    }
+
+    // Expose refreshDocenteDashboard globally
+    window.refreshDocenteDashboard = refreshDocenteDashboard;
+
+    function getScoreBadgeHtml(score, max) {
+        if (score === null || score === undefined) {
+            return `<span class="score-badge badge-pending">Pendiente</span>`;
+        }
+        if (score === max) {
+            return `<span class="score-badge badge-full">${score} / ${max}</span>`;
+        }
+        if (score >= max / 2) {
+            return `<span class="score-badge badge-partial">${score} / ${max}</span>`;
+        }
+        return `<span class="score-badge badge-low">${score} / ${max}</span>`;
+    }
+
+    function compileDocenteStats(students) {
+        const totalStudents = students.length;
+        
+        let totalCompleted = 0;
+        let totalScoreSum = 0;
+        let totalMaxPossible = 0;
+        
+        students.forEach(student => {
+            if (student.scores.quiz2 !== null) {
+                totalCompleted++;
+                totalScoreSum += student.scores.quiz2;
+                totalMaxPossible += 3;
+            }
+            if (student.scores.quiz3 !== null) {
+                totalCompleted++;
+                totalScoreSum += student.scores.quiz3;
+                totalMaxPossible += 3;
+            }
+            if (student.scores.quizGlosario !== null) {
+                totalCompleted++;
+                totalScoreSum += student.scores.quizGlosario;
+                totalMaxPossible += 2;
+            }
+        });
+        
+        const avgScorePercent = totalMaxPossible > 0 ? Math.round((totalScoreSum / totalMaxPossible) * 100) : 0;
+        
+        document.getElementById('stat-total-students').textContent = totalStudents;
+        document.getElementById('stat-total-completed').textContent = totalCompleted;
+        document.getElementById('stat-average-score').textContent = `${avgScorePercent}%`;
+    }
+
+    // Search input event
+    studentSearch.addEventListener('input', refreshDocenteDashboard);
+
+    // Export CSV
+    exportCsvBtn.addEventListener('click', () => {
+        const students = DatabaseManager.getStudents();
+        if (students.length === 0) {
+            alert('No hay alumnos registrados en la base de datos.');
+            return;
+        }
+
+        let csvContent = "data:text/csv;charset=utf-8,";
+        csvContent += "Estudiante,Etapa 20-30 (max 3),Etapa 30-50 (max 3),Glosario (max 2),Total (max 8),Ultima Actividad\n";
+        
+        students.forEach(student => {
+            const q2 = student.scores.quiz2 !== null ? student.scores.quiz2 : "";
+            const q3 = student.scores.quiz3 !== null ? student.scores.quiz3 : "";
+            const qg = student.scores.quizGlosario !== null ? student.scores.quizGlosario : "";
+            const total = (student.scores.quiz2 || 0) + (student.scores.quiz3 || 0) + (student.scores.quizGlosario || 0);
+            const lastActive = student.lastActive ? new Date(student.lastActive).toISOString() : "";
+            
+            csvContent += `"${student.email}",${q2},${q3},${qg},${total},"${lastActive}"\n`;
+        });
+
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "reporte_calificaciones_docente.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    });
+
+    // Reset Database
+    resetDatabaseBtn.addEventListener('click', () => {
+        if (confirm('¿Estás seguro de que deseas reiniciar la base de datos de calificaciones? Esto restablecerá los datos semilla de prueba.')) {
+            DatabaseManager.reset();
+            refreshDocenteDashboard();
+            alert('Base de datos restablecida.');
+        }
+    });
 });
