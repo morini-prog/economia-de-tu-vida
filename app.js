@@ -13,7 +13,45 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!data) {
                 return this.initSeeds();
             }
-            return JSON.parse(data);
+            try {
+                const parsed = JSON.parse(data);
+                if (!Array.isArray(parsed)) {
+                    return this.initSeeds();
+                }
+                
+                // Defensive repair of any corrupted or legacy records in localStorage
+                let needsSave = false;
+                parsed.forEach(student => {
+                    if (!student || typeof student !== 'object') {
+                        needsSave = true;
+                        return;
+                    }
+                    if (!student.email) {
+                        student.email = "anonimo@gmail.com";
+                        needsSave = true;
+                    }
+                    if (!student.scores || typeof student.scores !== 'object') {
+                        student.scores = { quiz2: null, quiz3: null, quizGlosario: null };
+                        needsSave = true;
+                    } else {
+                        if (student.scores.quiz2 === undefined) student.scores.quiz2 = null;
+                        if (student.scores.quiz3 === undefined) student.scores.quiz3 = null;
+                        if (student.scores.quizGlosario === undefined) student.scores.quizGlosario = null;
+                    }
+                    if (!student.lastActive) {
+                        student.lastActive = new Date().toISOString();
+                        needsSave = true;
+                    }
+                });
+                
+                if (needsSave) {
+                    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(parsed));
+                }
+                return parsed;
+            } catch (e) {
+                console.error("Error parsing student database, re-seeding.", e);
+                return this.initSeeds();
+            }
         }
 
         static initSeeds() {
@@ -44,8 +82,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         static saveStudent(email) {
+            if (!email) return;
             const students = this.getStudents();
-            const exists = students.find(s => s.email.toLowerCase() === email.toLowerCase());
+            const exists = students.find(s => s.email && s.email.toLowerCase() === email.toLowerCase());
             if (!exists) {
                 students.push({
                     email: email,
@@ -57,9 +96,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         static updateScore(email, quizId, score) {
+            if (!email) return;
             const students = this.getStudents();
-            const student = students.find(s => s.email.toLowerCase() === email.toLowerCase());
+            const student = students.find(s => s.email && s.email.toLowerCase() === email.toLowerCase());
             if (student) {
+                if (!student.scores) student.scores = { quiz2: null, quiz3: null, quizGlosario: null };
                 student.scores[quizId] = score;
                 student.lastActive = new Date().toISOString();
                 localStorage.setItem(this.STORAGE_KEY, JSON.stringify(students));
@@ -680,10 +721,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Helper to format email into Name and Last Name
     function formatStudentName(email) {
+        if (!email || typeof email !== 'string') return 'Estudiante';
         const namePart = email.split('@')[0];
+        if (!namePart) return 'Estudiante';
         if (namePart.includes('.')) {
             return namePart.split('.')
-                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                .map(word => word ? (word.charAt(0).toUpperCase() + word.slice(1)) : '')
                 .join(' ');
         }
         return namePart.charAt(0).toUpperCase() + namePart.slice(1);
@@ -698,7 +741,7 @@ document.addEventListener('DOMContentLoaded', () => {
         tableBody.innerHTML = '';
         
         // Filter elements
-        const filtered = students.filter(s => s.email.toLowerCase().includes(query));
+        const filtered = students.filter(s => s.email && s.email.toLowerCase().includes(query));
         
         if (filtered.length === 0) {
             noRecordsMsg.classList.remove('hidden');
@@ -708,12 +751,13 @@ document.addEventListener('DOMContentLoaded', () => {
             filtered.forEach(student => {
                 const tr = document.createElement('tr');
                 
-                const q2Badge = getScoreBadgeHtml(student.scores.quiz2, 3);
-                const q3Badge = getScoreBadgeHtml(student.scores.quiz3, 3);
-                const qgBadge = getScoreBadgeHtml(student.scores.quizGlosario, 2);
+                const scores = student.scores || { quiz2: null, quiz3: null, quizGlosario: null };
+                const q2Badge = getScoreBadgeHtml(scores.quiz2, 3);
+                const q3Badge = getScoreBadgeHtml(scores.quiz3, 3);
+                const qgBadge = getScoreBadgeHtml(scores.quizGlosario, 2);
                 
                 // Sum scores
-                const totalScore = (student.scores.quiz2 || 0) + (student.scores.quiz3 || 0) + (student.scores.quizGlosario || 0);
+                const totalScore = (scores.quiz2 || 0) + (scores.quiz3 || 0) + (scores.quizGlosario || 0);
                 const totalMax = 8;
                 
                 // Formatted name
@@ -765,19 +809,20 @@ document.addEventListener('DOMContentLoaded', () => {
         let totalMaxPossible = 0;
         
         students.forEach(student => {
-            if (student.scores.quiz2 !== null) {
+            const scores = student.scores || { quiz2: null, quiz3: null, quizGlosario: null };
+            if (scores.quiz2 !== null && scores.quiz2 !== undefined) {
                 totalCompleted++;
-                totalScoreSum += student.scores.quiz2;
+                totalScoreSum += Number(scores.quiz2) || 0;
                 totalMaxPossible += 3;
             }
-            if (student.scores.quiz3 !== null) {
+            if (scores.quiz3 !== null && scores.quiz3 !== undefined) {
                 totalCompleted++;
-                totalScoreSum += student.scores.quiz3;
+                totalScoreSum += Number(scores.quiz3) || 0;
                 totalMaxPossible += 3;
             }
-            if (student.scores.quizGlosario !== null) {
+            if (scores.quizGlosario !== null && scores.quizGlosario !== undefined) {
                 totalCompleted++;
-                totalScoreSum += student.scores.quizGlosario;
+                totalScoreSum += Number(scores.quizGlosario) || 0;
                 totalMaxPossible += 2;
             }
         });
@@ -794,94 +839,106 @@ document.addEventListener('DOMContentLoaded', () => {
         const podiumLayout = document.getElementById('podiumLayout');
         if (!podiumLayout) return;
 
-        // Map and filter active students who completed at least one quiz
-        const scoredStudents = students.map(student => {
-            let takenCount = 0;
-            let scoreSum = 0;
-            let maxPossible = 0;
-            
-            if (student.scores.quiz2 !== null) {
-                takenCount++;
-                scoreSum += student.scores.quiz2;
-                maxPossible += 3;
-            }
-            if (student.scores.quiz3 !== null) {
-                takenCount++;
-                scoreSum += student.scores.quiz3;
-                maxPossible += 3;
-            }
-            if (student.scores.quizGlosario !== null) {
-                takenCount++;
-                scoreSum += student.scores.quizGlosario;
-                maxPossible += 2;
-            }
-            
-            const pct = maxPossible > 0 ? (scoreSum / maxPossible) * 100 : 0;
-            
-            return {
-                ...student,
-                totalScore: (student.scores.quiz2 || 0) + (student.scores.quiz3 || 0) + (student.scores.quizGlosario || 0),
-                hasTaken: takenCount > 0,
-                percentage: Math.round(pct)
-            };
-        }).filter(s => s.hasTaken);
+        try {
+            // Map and filter active students who completed at least one quiz
+            const scoredStudents = students.map(student => {
+                if (!student) return { hasTaken: false };
+                const scores = student.scores || { quiz2: null, quiz3: null, quizGlosario: null };
+                
+                let takenCount = 0;
+                let scoreSum = 0;
+                let maxPossible = 0;
+                
+                if (scores.quiz2 !== null && scores.quiz2 !== undefined) {
+                    takenCount++;
+                    scoreSum += Number(scores.quiz2) || 0;
+                    maxPossible += 3;
+                }
+                if (scores.quiz3 !== null && scores.quiz3 !== undefined) {
+                    takenCount++;
+                    scoreSum += Number(scores.quiz3) || 0;
+                    maxPossible += 3;
+                }
+                if (scores.quizGlosario !== null && scores.quizGlosario !== undefined) {
+                    takenCount++;
+                    scoreSum += Number(scores.quizGlosario) || 0;
+                    maxPossible += 2;
+                }
+                
+                const pct = maxPossible > 0 ? (scoreSum / maxPossible) * 100 : 0;
+                
+                return {
+                    ...student,
+                    totalScore: (Number(scores.quiz2) || 0) + (Number(scores.quiz3) || 0) + (Number(scores.quizGlosario) || 0),
+                    hasTaken: takenCount > 0,
+                    percentage: Math.round(pct)
+                };
+            }).filter(s => s.hasTaken);
 
-        // Sort descending by percentage, then by total score, then alphabetically
-        scoredStudents.sort((a, b) => {
-            if (b.percentage !== a.percentage) {
-                return b.percentage - a.percentage;
-            }
-            if (b.totalScore !== a.totalScore) {
-                return b.totalScore - a.totalScore;
-            }
-            return a.email.localeCompare(b.email);
-        });
+            // Sort descending by percentage, then by total score, then alphabetically
+            scoredStudents.sort((a, b) => {
+                if (b.percentage !== a.percentage) {
+                    return b.percentage - a.percentage;
+                }
+                if (b.totalScore !== a.totalScore) {
+                    return b.totalScore - a.totalScore;
+                }
+                return (a.email || "").localeCompare(b.email || "");
+            });
 
-        // Get Top 3
-        const top3 = scoredStudents.slice(0, 3);
+            // Get Top 3
+            const top3 = scoredStudents.slice(0, 3);
 
-        if (top3.length === 0) {
+            if (top3.length === 0) {
+                podiumLayout.innerHTML = `
+                    <div style="grid-column: span 3; text-align: center; padding: 24px 0; color: var(--text-secondary);">
+                        <i data-lucide="info" style="width: 24px; height: 24px; margin-bottom: 8px; color: var(--color-primary); display: inline-block;"></i>
+                        <p>Aún no hay calificaciones registradas para armar el podio escolar.</p>
+                    </div>
+                `;
+                lucide.createIcons();
+                return;
+            }
+
+            let layoutHtml = '';
+            const spot2 = top3[1];
+            const spot1 = top3[0];
+            const spot3 = top3[2];
+
+            // 2nd Place (Left)
+            if (spot2) {
+                layoutHtml += renderPodiumSpotHtml(spot2, 'second', '2');
+            } else {
+                layoutHtml += '<div class="podium-spot-empty"></div>';
+            }
+
+            // 1st Place (Center)
+            if (spot1) {
+                layoutHtml += renderPodiumSpotHtml(spot1, 'first', '1');
+            }
+
+            // 3rd Place (Right)
+            if (spot3) {
+                layoutHtml += renderPodiumSpotHtml(spot3, 'third', '3');
+            } else {
+                layoutHtml += '<div class="podium-spot-empty"></div>';
+            }
+
+            podiumLayout.innerHTML = layoutHtml;
+            lucide.createIcons();
+        } catch (e) {
+            console.error("Error in refreshPodium:", e);
             podiumLayout.innerHTML = `
                 <div style="grid-column: span 3; text-align: center; padding: 24px 0; color: var(--text-secondary);">
-                    <i data-lucide="info" style="width: 24px; height: 24px; margin-bottom: 8px; color: var(--color-primary); display: inline-block;"></i>
-                    <p>Aún no hay calificaciones registradas para armar el podio escolar.</p>
+                    <p>Error cargando el podio de calificaciones.</p>
                 </div>
             `;
-            lucide.createIcons();
-            return;
         }
-
-        let layoutHtml = '';
-        const spot2 = top3[1];
-        const spot1 = top3[0];
-        const spot3 = top3[2];
-
-        // 2nd Place (Left)
-        if (spot2) {
-            layoutHtml += renderPodiumSpotHtml(spot2, 'second', '2');
-        } else {
-            layoutHtml += '<div class="podium-spot-empty"></div>';
-        }
-
-        // 1st Place (Center)
-        if (spot1) {
-            layoutHtml += renderPodiumSpotHtml(spot1, 'first', '1');
-        }
-
-        // 3rd Place (Right)
-        if (spot3) {
-            layoutHtml += renderPodiumSpotHtml(spot3, 'third', '3');
-        } else {
-            layoutHtml += '<div class="podium-spot-empty"></div>';
-        }
-
-        podiumLayout.innerHTML = layoutHtml;
-        lucide.createIcons();
     }
 
     function renderPodiumSpotHtml(student, rankClass, number) {
         const formattedName = formatStudentName(student.email);
-        const initial = student.email.charAt(0).toUpperCase();
+        const initial = student.email ? student.email.charAt(0).toUpperCase() : 'E';
         const crown = rankClass === 'first' ? '<i data-lucide="crown" class="podium-crown"></i>' : '';
         
         return `
@@ -914,10 +971,11 @@ document.addEventListener('DOMContentLoaded', () => {
         csvContent += "Estudiante,Nombre,Etapa 20-30 (max 3),Etapa 30-50 (max 3),Glosario (max 2),Total (max 8),Ultima Actividad\n";
         
         students.forEach(student => {
-            const q2 = student.scores.quiz2 !== null ? student.scores.quiz2 : "";
-            const q3 = student.scores.quiz3 !== null ? student.scores.quiz3 : "";
-            const qg = student.scores.quizGlosario !== null ? student.scores.quizGlosario : "";
-            const total = (student.scores.quiz2 || 0) + (student.scores.quiz3 || 0) + (student.scores.quizGlosario || 0);
+            const scores = student.scores || { quiz2: null, quiz3: null, quizGlosario: null };
+            const q2 = scores.quiz2 !== null ? scores.quiz2 : "";
+            const q3 = scores.quiz3 !== null ? scores.quiz3 : "";
+            const qg = scores.quizGlosario !== null ? scores.quizGlosario : "";
+            const total = (scores.quiz2 || 0) + (scores.quiz3 || 0) + (scores.quizGlosario || 0);
             const lastActive = student.lastActive ? new Date(student.lastActive).toISOString() : "";
             const name = formatStudentName(student.email);
             
