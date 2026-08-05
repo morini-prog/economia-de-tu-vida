@@ -79,7 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Expose DatabaseManager globally if needed
+    // Expose DatabaseManager globally
     window.DatabaseManager = DatabaseManager;
 
 
@@ -94,21 +94,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Function to switch tabs
     window.switchTab = function(tabId) {
-        // Secure tab check for Teacher panel
-        if (tabId === 'tab-docente') {
-            const userJson = localStorage.getItem('economy_vida_user');
-            if (!userJson) {
-                switchTab('tab-inicio');
-                openLoginModal();
-                return;
+        const userJson = localStorage.getItem('economy_vida_user');
+        
+        // If not logged in, force login screen
+        if (!userJson) {
+            tabId = 'tab-login';
+        } else {
+            // Logged in user cannot access login screen
+            if (tabId === 'tab-login') {
+                const user = JSON.parse(userJson);
+                tabId = user.role === 'docente' ? 'tab-docente' : 'tab-inicio';
             }
-            const user = JSON.parse(userJson);
-            if (user.role !== 'docente') {
-                switchTab('tab-inicio');
-                return;
+            
+            // Secure tab check for Teacher panel
+            if (tabId === 'tab-docente') {
+                const user = JSON.parse(userJson);
+                if (user.role !== 'docente') {
+                    switchTab('tab-inicio');
+                    return;
+                }
+                // Render docente dashboard
+                refreshDocenteDashboard();
             }
-            // If they are teacher, render the dashboard
-            refreshDocenteDashboard();
         }
 
         // Update Desktop Tabs
@@ -389,7 +396,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     
                     // Live refresh of Docente panel if currently visible
                     const docenteSection = document.getElementById('tab-docente');
-                    if (docenteSection.classList.contains('active-section')) {
+                    if (docenteSection && docenteSection.classList.contains('active-section')) {
                         refreshDocenteDashboard();
                     }
                 }
@@ -448,12 +455,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // ==========================================
-    // AUTHENTICATION SYSTEM (Students & Docente)
+    // AUTHENTICATION SYSTEM (Gatekeeper Landing)
     // ==========================================
-    const loginModal = document.getElementById('loginModal');
-    const headerAuthBtn = document.getElementById('headerAuthBtn');
-    const closeLoginModalBtn = document.getElementById('closeLoginModalBtn');
-    
     const roleTabEstudiante = document.getElementById('role-tab-estudiante');
     const roleTabDocente = document.getElementById('role-tab-docente');
     const formEstudiante = document.getElementById('form-estudiante');
@@ -476,24 +479,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const userAvatar = document.getElementById('userAvatar');
     const logoutBtn = document.getElementById('logoutBtn');
 
-    // Open/Close Auth Modal
-    function openLoginModal() {
-        loginModal.classList.remove('hidden');
-        resetLoginForm();
-    }
-
-    function closeLoginModal() {
-        loginModal.classList.add('hidden');
-    }
-
-    headerAuthBtn.addEventListener('click', openLoginModal);
-    closeLoginModalBtn.addEventListener('click', closeLoginModal);
-
-    // Lock screen trigger buttons inside quizzes
-    document.querySelectorAll('.btn-login-trigger').forEach(btn => {
-        btn.addEventListener('click', openLoginModal);
-    });
-
     // Toggle Role Form
     function setRole(role) {
         if (role === 'estudiante') {
@@ -511,13 +496,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     roleTabEstudiante.addEventListener('click', () => setRole('estudiante'));
     roleTabDocente.addEventListener('click', () => setRole('docente'));
-
-    // Reset login form fields
-    function resetLoginForm() {
-        docentePassword.value = '';
-        loginErrorMessage.classList.add('hidden');
-        setRole('estudiante');
-    }
 
     // Toggle Password Visibility
     togglePasswordBtn.addEventListener('click', () => {
@@ -538,15 +516,12 @@ document.addEventListener('DOMContentLoaded', () => {
     docenteSubmitBtn.addEventListener('click', () => {
         const password = docentePassword.value.trim();
         if (password === '2228') {
-            // Success
             loginErrorMessage.classList.add('hidden');
-            closeLoginModal();
             
             const teacherUser = { email: 'docente@colegio.edu.ar', role: 'docente' };
             localStorage.setItem('economy_vida_user', JSON.stringify(teacherUser));
             
             checkLoginState();
-            switchTab('tab-docente');
         } else {
             loginErrorMessage.classList.remove('hidden');
         }
@@ -561,7 +536,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Google Login Flow
     googleSignInBtn.addEventListener('click', () => {
-        closeLoginModal();
         googleModal.classList.remove('hidden');
         googleEmailInput.value = '';
         googleEmailStep.classList.remove('hidden');
@@ -621,7 +595,6 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.removeItem('economy_vida_user');
         userProfileMenu.classList.remove('menu-active');
         checkLoginState();
-        switchTab('tab-inicio');
     });
 
 
@@ -630,26 +603,23 @@ document.addEventListener('DOMContentLoaded', () => {
     // ==========================================
     function checkLoginState() {
         const userJson = localStorage.getItem('economy_vida_user');
+        const navTabs = document.getElementById('navTabs');
+        const mobileNav = document.getElementById('mobileNav');
+        const profileEmail = document.getElementById('profileEmail');
+        const profileRole = document.getElementById('profileRole');
+
         const docButtons = [
             document.getElementById('btn-tab-docente'),
             document.getElementById('btn-mobile-tab-docente')
         ];
-        
-        const blockers = [
-            document.getElementById('blocker-quiz2'),
-            document.getElementById('blocker-quiz3'),
-            document.getElementById('blocker-quiz4')
-        ];
-
-        const profileEmail = document.getElementById('profileEmail');
-        const profileRole = document.getElementById('profileRole');
 
         if (userJson) {
             const user = JSON.parse(userJson);
             
-            // Show avatar, hide login btn
-            headerAuthBtn.classList.add('hidden');
+            // Show navigation options & profile
+            navTabs.classList.remove('hidden');
             userProfileMenu.classList.remove('hidden');
+            mobileMenuBtn.classList.remove('hidden');
             
             if (user.role === 'docente') {
                 userAvatar.textContent = 'D';
@@ -660,8 +630,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Show docente tabs
                 docButtons.forEach(btn => btn && btn.classList.remove('hidden'));
                 
-                // Unblock quizes (docente can run them for testing)
-                blockers.forEach(blk => blk && blk.classList.add('hidden'));
+                // Automatically switch to docente tab if we are on login screen
+                const activeSection = document.querySelector('.tab-section.active-section');
+                if (!activeSection || activeSection.id === 'tab-login') {
+                    switchTab('tab-docente');
+                }
             } else {
                 const initial = user.email.trim().charAt(0).toUpperCase();
                 userAvatar.textContent = initial;
@@ -672,25 +645,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Hide docente tabs
                 docButtons.forEach(btn => btn && btn.classList.add('hidden'));
                 
-                // Unblock quizzes
-                blockers.forEach(blk => blk && blk.classList.add('hidden'));
+                // Automatically switch to inicio tab if we are on login screen
+                const activeSection = document.querySelector('.tab-section.active-section');
+                if (!activeSection || activeSection.id === 'tab-login') {
+                    switchTab('tab-inicio');
+                }
             }
         } else {
-            // Clean state
-            headerAuthBtn.classList.remove('hidden');
+            // Clean state - Hide nav tabs and profile
+            navTabs.classList.add('hidden');
+            mobileNav.classList.add('hidden');
+            mobileNav.classList.remove('mobile-active');
             userProfileMenu.classList.add('hidden');
+            mobileMenuBtn.classList.add('hidden'); // Hide mobile hamburger menu
             
             // Hide docente tabs
             docButtons.forEach(btn => btn && btn.classList.add('hidden'));
             
-            // Block quizzes
-            blockers.forEach(blk => blk && blk.classList.remove('hidden'));
-            
-            // Redirect from Docente page if user logged out while looking at it
-            const activeSection = document.querySelector('.tab-section.active-section');
-            if (activeSection && activeSection.id === 'tab-docente') {
-                switchTab('tab-inicio');
-            }
+            // Force redirection to login tab
+            switchTab('tab-login');
         }
     }
 
@@ -753,9 +726,6 @@ document.addEventListener('DOMContentLoaded', () => {
         // Update stats
         compileDocenteStats(students);
     }
-
-    // Expose refreshDocenteDashboard globally
-    window.refreshDocenteDashboard = refreshDocenteDashboard;
 
     function getScoreBadgeHtml(score, max) {
         if (score === null || score === undefined) {

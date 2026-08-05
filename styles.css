@@ -2349,3 +2349,67 @@ body {
         max-width: 90%;
     }
 }
+
+/* ==========================================
+   LOGIN GATEKEEPER LANDING PAGE STYLES
+   ========================================== */
+.login-gatekeeper-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(100vh - 180px);
+    padding: 40px 0;
+}
+
+.login-gatekeeper-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.login-branding {
+    text-align: center;
+    margin-bottom: 28px;
+}
+
+.logo-icon-large {
+    background: var(--gradient-primary);
+    color: #ffffff;
+    width: 64px;
+    height: 64px;
+    border-radius: var(--radius-lg);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 12px rgba(15, 118, 110, 0.2);
+}
+
+.logo-icon-large i {
+    width: 32px;
+    height: 32px;
+}
+
+.login-branding h2 {
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin-bottom: 4px;
+    color: var(--text-primary);
+}
+
+.login-branding p {
+    font-size: 11px;
+    color: var(--text-secondary);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.gatekeeper-card {
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--border-color);
+}
+
