@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>La Economía de tu Vida - Tomás Bulat | Guía Interactiva</title>
+    <meta name="description" content="Aprende a administrar tus finanzas de los 20 a los 50 años y más, basado en el libro 'La economía de tu vida' de Tomás Bulat.">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="styles.css">
+    <!-- Lucide Icons (CDN) -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <!-- Navbar -->
+    <header class="app-header">
+        <div class="header-container">
+            <div class="logo-area">
+                <div class="logo-icon">
+                    <i data-lucide="trending-up"></i>
+                </div>
+                <div class="logo-text">
+                    <span class="logo-title">Economía de tu Vida</span>
+                    <span class="logo-subtitle">Método Tomás Bulat</span>
+                </div>
+            </div>
+            
+            <!-- Desktop Navigation -->
+            <nav class="nav-tabs" id="navTabs">
+                <button class="tab-btn active" data-tab="tab-inicio" id="btn-tab-inicio">
+                    <i data-lucide="home"></i> Inicio
+                </button>
+                <button class="tab-btn" data-tab="tab-20-30" id="btn-tab-20-30">
+                    <i data-lucide="user"></i> 20 a 30 Años
+                </button>
+                <button class="tab-btn" data-tab="tab-30-50" id="btn-tab-30-50">
+                    <i data-lucide="briefcase"></i> 30 a 50 Años
+                </button>
+                <button class="tab-btn" data-tab="tab-glosario" id="btn-tab-glosario">
+                    <i data-lucide="book-open"></i> Glosario
+                </button>
+            </nav>
+
+            <div class="header-actions">
+                <button class="theme-toggle" id="themeToggleBtn" aria-label="Cambiar Tema">
+                    <i data-lucide="moon" class="icon-moon"></i>
+                    <i data-lucide="sun" class="icon-sun"></i>
+                </button>
+                <button class="mobile-menu-toggle" id="mobileMenuBtn" aria-label="Menú">
+                    <i data-lucide="menu"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Mobile Navigation Dropdown -->
+        <nav class="mobile-nav" id="mobileNav">
+            <button class="mobile-tab-btn active" data-tab="tab-inicio">Inicio</button>
+            <button class="mobile-tab-btn" data-tab="tab-20-30">20 a 30 Años</button>
+            <button class="mobile-tab-btn" data-tab="tab-30-50">30 a 50 Años</button>
+            <button class="mobile-tab-btn" data-tab="tab-glosario">Glosario</button>
+        </nav>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+        
+        <!-- PESTAÑA 1: INICIO -->
+        <section id="tab-inicio" class="tab-section active-section">
+            <div class="hero-section">
+                <div class="hero-content">
+                    <span class="hero-badge">Inspirado en Tomás Bulat</span>
+                    <h1 class="hero-title">La economía de tu vida</h1>
+                    <p class="hero-subtitle">Cómo administrarte de los 10 a los 100 años</p>
+                    <p class="hero-description">
+                        Descubre cómo cambian tus desafíos financieros según tu edad. Esta guía interactiva basada en el libro del célebre economista Tomás Bulat te enseña a manejar el endeudamiento estratégico, a construir tu historia crediticia y a consolidar un ahorro sistemático para cada etapa de tu vida.
+                    </p>
+                    <div class="hero-cta-group">
+                        <button class="cta-btn primary-btn" onclick="switchTab('tab-20-30')">
+                            Empezar Etapa 20 - 30 <i data-lucide="arrow-right"></i>
+                        </button>
+                        <button class="cta-btn secondary-btn" onclick="switchTab('tab-glosario')">
+                            Ver Glosario
+                        </button>
+                    </div>
+                </div>
+                <div class="hero-visual">
+                    <div class="visual-card">
+                        <!-- Abstract Visual Finance Animation/Graph -->
+                        <div class="chart-illustration">
+                            <div class="chart-circle">
+                                <div class="chart-inner-circle">
+                                    <span class="chart-value">$</span>
+                                </div>
+                            </div>
+                            <div class="chart-bar bar-1"></div>
+                            <div class="chart-bar bar-2"></div>
+                            <div class="chart-bar bar-3"></div>
+                            <div class="chart-bar bar-4"></div>
+                        </div>
+                        <div class="visual-badge-floating badge-top">
+                            <i data-lucide="piggy-bank"></i>
+                            <span>Ahorro</span>
+                        </div>
+                        <div class="visual-badge-floating badge-bottom">
+                            <i data-lucide="credit-card"></i>
+                            <span>Crédito Inteligente</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Introduction Section -->
+            <div class="intro-grid">
+                <div class="intro-card card-hover">
+                    <div class="card-icon icon-teal">
+                        <i data-lucide="shield-check"></i>
+                    </div>
+                    <h3>Endeudamiento Estratégico</h3>
+                    <p>La deuda no es una "mala palabra". Si se planifica y se usa para adquirir bienes duraderos o activos, es una herramienta poderosa para mejorar tu calidad de vida y crecimiento personal.</p>
+                </div>
+                
+                <div class="intro-card card-hover">
+                    <div class="card-icon icon-blue">
+                        <i data-lucide="award"></i>
+                    </div>
+                    <h3>Capacidad y Voluntad</h3>
+                    <p>El sistema financiero evalúa constantemente cuánto puedes pagar (capacidad) y cuán cumplidor eres con tus deudas (voluntad de pago). Construir un perfil sólido te abrirá puertas vitales.</p>
+                </div>
+
+                <div class="intro-card card-hover">
+                    <div class="card-icon icon-gold">
+                        <i data-lucide="wallet"></i>
+                    </div>
+                    <h3>Ahorro Sistemático</h3>
+                    <p>La clave no es guardar "lo que sobra" a fin de mes, sino separar una parte de tus ingresos ni bien los recibes. El ahorro es una decisión activa e inteligente.</p>
+                </div>
+            </div>
+
+            <!-- Author Quote -->
+            <div class="quote-container">
+                <blockquote class="bulat-quote">
+                    <p>"Acordate: 'endeudarse' no es una mala palabra. No tengas miedo de estar endeudado a los 30. Todo lo contrario: preocupate si no tenés deudas. En cambio, si estás muy endeudado a los 50, entonces te diría ¡alerta!"</p>
+                    <cite>— Tomás Bulat, La economía de tu vida</cite>
+                </blockquote>
+            </div>
+        </section>
+
+        <!-- PESTAÑA 2: 20 A 30 AÑOS -->
+        <section id="tab-20-30" class="tab-section">
+            <div class="section-header">
+                <span class="stage-tag">De los 20 a los 30 Años</span>
+                <h2>Escribiendo la historia crediticia</h2>
+                <p class="section-intro">Tu primer empleo formal es la puerta de entrada al sistema financiero. Es el momento clave para demostrarle a los bancos quién eres y cómo manejas tus compromisos.</p>
+            </div>
+
+            <!-- Section Content Cards -->
+            <div class="info-timeline">
+                <!-- Section 1 -->
+                <div class="timeline-step">
+                    <div class="step-marker">1</div>
+                    <div class="step-content">
+                        <h3>Bancarización e Historia Crediticia</h3>
+                        <p>Cuando conseguís tu primer trabajo, ocurre la <strong>bancarización</strong>. El banco abre una cuenta a tu nombre, te entrega una tarjeta de débito y te ofrece tu primera tarjeta de crédito. Con esta última, comenzás a escribir tu <strong>historia crediticia</strong>: el registro de qué tan cumplidor y activo sos con tus deudas.</p>
+                        <div class="alert-box note-box">
+                            <i data-lucide="info"></i>
+                            <div class="alert-content">
+                                <strong>Doble Evaluación Bancaria:</strong> Al no tener antecedentes, los bancos te evaluarán bajo dos dimensiones clave:
+                                <ul>
+                                    <li><strong>Capacidad de pago:</strong> Tus ingresos demostrables vs. tus deudas.</li>
+                                    <li><strong>Voluntad de pago:</strong> Tu comportamiento histórico de pago (si pagás en término y en su totalidad).</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 2 -->
+                <div class="timeline-step">
+                    <div class="step-marker">2</div>
+                    <div class="step-content">
+                        <h3>El ABC de la Tarjeta de Crédito</h3>
+                        <p>La tarjeta de crédito suele ser el primer método de endeudamiento propio. Para dominarla en lugar de que ella te domine, debés seguir estas pautas esenciales:</p>
+                        
+                        <div class="card-grid-2">
+                            <div class="inner-card">
+                                <h4><i data-lucide="check-circle" class="text-success"></i> Rutina de Pago</h4>
+                                <p>Pagar el resumen en término y por la <strong>totalidad</strong> debe ser tu regla absoluta. Evitá a toda costa realizar el pago mínimo, ya que genera intereses muy elevados y difíciles de saldar.</p>
+                            </div>
+                            <div class="inner-card">
+                                <h4><i data-lucide="sliders"></i> Límite de Cuotas</h4>
+                                <p>Conocé la diferencia entre el <strong>límite de una cuota</strong> (compras en un solo pago) y el <strong>límite de muchas cuotas</strong> (financiación a largo plazo). No son los mismos montos.</p>
+                            </div>
+                        </div>
+
+                        <!-- Date comparison interactive graphic -->
+                        <div class="date-comparison-widget">
+                            <h4>El Truco de los 40 Días de Financiación</h4>
+                            <div class="timeline-slider-visual">
+                                <div class="timeline-point point-cierre">
+                                    <div class="point-circle"></div>
+                                    <div class="point-label">Fecha de Cierre</div>
+                                    <div class="point-desc">Consolidación de gastos</div>
+                                </div>
+                                <div class="timeline-arrow-path">
+                                    <span class="path-label">Día Siguiente: Compras aquí</span>
+                                    <div class="arrow-line"></div>
+                                </div>
+                                <div class="timeline-point point-pago">
+                                    <div class="point-circle"></div>
+                                    <div class="point-label">Fecha de Pago</div>
+                                    <div class="point-desc">Vence el resumen</div>
+                                </div>
+                            </div>
+                            <p class="widget-explanation">
+                                <i data-lucide="sparkles"></i> <strong>Tip de Tomás Bulat:</strong> Si realizás una compra importante <strong>el día posterior a la fecha de cierre</strong> de la tarjeta, ese gasto ingresará recién en el siguiente ciclo. Esto te otorga entre <strong>40 y 44 días</strong> para pagarla sin ningún tipo de interés.
+                            </p>
+                        </div>
+
+                        <div class="card-grid-2">
+                            <div class="inner-card">
+                                <h4><i data-lucide="eye"></i> Control de Cargos y Estafas</h4>
+                                <p>Tomás Bulat recomienda <strong>pagar manualmente</strong> en lugar de usar débito automático si eres ordenado. Esto te obliga a revisar detalladamente el resumen, tomar conciencia de lo gastado y detectar posibles estafas o cobros repetidos.</p>
+                                <div class="alert-box warning-box">
+                                    <i data-lucide="alert-triangle"></i>
+                                    <span>Tenés <strong>30 días</strong> a partir de recibir el resumen para objetar cobros erróneos o no autorizados. ¡Pasado ese plazo, perdés el derecho al reclamo!</span>
+                                </div>
+                            </div>
+                            <div class="inner-card">
+                                <h4><i data-lucide="refresh-cw"></i> Débito Automático</h4>
+                                <p>Si solés ser "colgado" u olvidadizo con las fechas, adherir el pago de tu tarjeta al débito automático es la mejor alternativa para evitar recargos e intereses punitorios por mora.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 3 -->
+                <div class="timeline-step">
+                    <div class="step-marker">3</div>
+                    <div class="step-content">
+                        <h3>La Marca Personal: Préstamos Personales</h3>
+                        <p>El banco te ofrecerá el famoso <strong>préstamo sueldo</strong>. Es un crédito de otorgamiento casi automático cuyo cobro se descuenta directamente de tu cuenta sueldo.</p>
+                        
+                        <div class="guidelines-box">
+                            <h4>Recomendaciones Clave para Préstamos Sueldo:</h4>
+                            <ul>
+                                <li>
+                                    <i data-lucide="arrow-right-circle"></i>
+                                    <div><strong>Límite Habitual:</strong> Suele tener un tope máximo equivalente a 5 sueldos.</div>
+                                </li>
+                                <li>
+                                    <i data-lucide="arrow-right-circle"></i>
+                                    <div><strong>Pedí solo lo necesario:</strong> No solicites el máximo permitido si no vas a usarlo. Evita pagar intereses de más.</div>
+                                </li>
+                                <li>
+                                    <i data-lucide="arrow-right-circle"></i>
+                                    <div><strong>Cercanía de la compra:</strong> Pedí el préstamo lo más cerca posible de la fecha en que realizarás el gasto para evitar que el dinero quede parado sumando intereses o devaluándose.</div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quiz Section Pestaña 2 -->
+            <div class="quiz-container" id="quiz-20-30">
+                <div class="quiz-header">
+                    <i data-lucide="check-square"></i>
+                    <h3>Autoevaluación: Etapa de 20 a 30 años</h3>
+                </div>
+                <div class="quiz-progress">
+                    <div class="progress-bar" id="progress-quiz2" style="width: 0%;"></div>
+                </div>
+                <div class="quiz-questions">
+                    <!-- Question 1 -->
+                    <div class="question-block active-question" data-qindex="0">
+                        <span class="question-number">Pregunta 1 de 3</span>
+                        <h4 class="question-text">¿Qué sucede si realizás una compra con tarjeta de crédito el día posterior a la fecha de cierre?</h4>
+                        <div class="options-list">
+                            <button class="option-btn" data-correct="false">A) Se cancela la operación por exceso de límite.</button>
+                            <button class="option-btn" data-correct="false">B) Se cobra un recargo por fuera de término.</button>
+                            <button class="option-btn" data-correct="true">C) La pagás después de 40 a 44 días.</button>
+                            <button class="option-btn" data-correct="false">D) Debés abonarla obligatoriamente al día siguiente.</button>
+                        </div>
+                        <div class="question-feedback hidden"></div>
+                    </div>
+                    
+                    <!-- Question 2 -->
+                    <div class="question-block" data-qindex="1">
+                        <span class="question-number">Pregunta 2 de 3</span>
+                        <h4 class="question-text">¿De cuánto tiempo disponés a partir de la recepción del resumen para objetar gastos imputados por error?</h4>
+                        <div class="options-list">
+                            <button class="option-btn" data-correct="false">A) 5 días.</button>
+                            <button class="option-btn" data-correct="false">B) 10 días.</button>
+                            <button class="option-btn" data-correct="true">C) 30 días.</button>
+                            <button class="option-btn" data-correct="false">D) 60 días.</button>
+                        </div>
+                        <div class="question-feedback hidden"></div>
+                    </div>
+
+                    <!-- Question 3 -->
+                    <div class="question-block" data-qindex="2">
+                        <span class="question-number">Pregunta 3 de 3</span>
+                        <h4 class="question-text">Al solicitar un préstamo personal ("préstamo sueldo"), ¿cuál es la recomendación clave expuesta en el texto?</h4>
+                        <div class="options-list">
+                            <button class="option-btn" data-correct="false">A) Pedir el monto máximo permitido aunque no se utilice.</button>
+                            <button class="option-btn" data-correct="false">B) Solicitar el dinero con varios meses de anticipación.</button>
+                            <button class="option-btn" data-correct="true">C) Pedir solo lo que vayas a utilizar y lo más cerca posible de la compra.</button>
+                            <button class="option-btn" data-correct="false">D) Evitar pagarlo a través del descuento del sueldo.</button>
+                        </div>
+                        <div class="question-feedback hidden"></div>
+                    </div>
+                </div>
+                <div class="quiz-footer">
+                    <span class="score-display">Puntaje: <span class="current-score">0</span>/3</span>
+                    <button class="quiz-nav-btn next-btn" id="next-btn-quiz2" disabled>Siguiente Pregunta <i data-lucide="chevron-right"></i></button>
+                    <button class="quiz-nav-btn restart-btn hidden" id="restart-btn-quiz2">Reiniciar Cuestionario <i data-lucide="refresh-cw"></i></button>
+                </div>
+                <div class="quiz-result-card hidden" id="result-quiz2">
+                    <div class="result-icon">
+                        <i data-lucide="award"></i>
+                    </div>
+                    <h4>¡Evaluación Completada!</h4>
+                    <p class="result-message"></p>
+                    <span class="final-score">Puntaje Final: 3 / 3</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- PESTAÑA 3: 30 A 50 AÑOS -->
+        <section id="tab-30-50" class="tab-section">
+            <div class="section-header">
+                <span class="stage-tag">De los 30 a los 50 Años</span>
+                <h2>Disfrutá de la vida hoy</h2>
+                <p class="section-intro">Esta es la etapa de mayor productividad laboral e ingresos, pero también el momento donde se acumulan las mayores responsabilidades y metas de consumo de la vida.</p>
+            </div>
+
+            <!-- Content Layout -->
+            <div class="info-grid-30-50">
+                <!-- Section 1 -->
+                <div class="content-card">
+                    <div class="card-header-accent header-teal">
+                        <i data-lucide="scale"></i>
+                        <h3>Decisiones de Gasto y Endeudamiento Estratégico</h3>
+                    </div>
+                    <div class="card-body">
+                        <p>A los 30 años se incrementan los ingresos y el progreso laboral, pero surgen mayores gastos: casamiento, hijos, auto, educación, mudanza o emprendimientos. El dinero <em>"entra a gotas y sale a baldes"</em>.</p>
+                        
+                        <div class="info-split">
+                            <div class="split-col">
+                                <h5>Transferencia Intergeneracional</h5>
+                                <p>En países desarrollados, el sistema financiero transfiere recursos de los mayores de 50 años (con capacidad de ahorro) hacia los jóvenes de 30 años (que necesitan comprar activos como vivienda o auto) a través de créditos a largo plazo.</p>
+                            </div>
+                            <div class="split-col">
+                                <h5>La Realidad Local: Family & Friends Banks</h5>
+                                <p>Sin crédito hipotecario masivo local, recurrimos a préstamos de padres o amigos cercanos para acceder a inmuebles (deudas en dólares con la propiedad como garantía).</p>
+                            </div>
+                        </div>
+
+                        <div class="alert-box tip-box">
+                            <i data-lucide="lightbulb"></i>
+                            <div class="alert-content">
+                                <strong>Estrategia en Bienes Duraderos:</strong> Tomás Bulat aconseja endeudarse para equipar el hogar (heladera, lavarropas, tecnología) a la <strong>mayor cantidad de cuotas posible</strong>. En contextos inflacionarios, la inflación va licuando el valor real de las cuotas mensuales, convirtiendo la deuda planificada en una excelente herramienta para vivir bien hoy y ahorrar después.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 2 -->
+                <div class="content-card">
+                    <div class="card-header-accent header-blue">
+                        <i data-lucide="piggy-bank"></i>
+                        <h3>La Importancia del Ahorro Sistemático</h3>
+                    </div>
+                    <div class="card-body">
+                        <p>Para no desestabilizarse económicamente con los gastos diarios, es vital incorporar el hábito del ahorro desde una perspectiva estructural.</p>
+                        
+                        <div class="rule-box">
+                            <div class="rule-header">
+                                <i data-lucide="star" class="text-gold"></i>
+                                <span>La Regla de Oro del Ahorro</span>
+                            </div>
+                            <div class="rule-comparison">
+                                <div class="comp-box bad-comp">
+                                    <span class="comp-title">Método Tradicional (Incorrecto)</span>
+                                    <span class="comp-formula">Ingresos - Gastos = Ahorro</span>
+                                    <p class="comp-desc">Ahorrar sólo lo que sobra a fin de mes. En la práctica, casi nunca sobra nada y el ahorro es inexistente.</p>
+                                </div>
+                                <div class="comp-box good-comp">
+                                    <span class="comp-title">Método Bulat (Regla de Oro)</span>
+                                    <span class="comp-formula">Ingresos - Ahorro = Gastos</span>
+                                    <p class="comp-desc">Separar primero un porcentaje fijo del ingreso ni bien se cobra, y luego amoldar el presupuesto a lo restante.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h4>Estrategias Prácticas de Ahorro</h4>
+                        <div class="strategies-grid">
+                            <div class="strategy-item">
+                                <i data-lucide="gift"></i>
+                                <div>
+                                    <h5>El Aguinaldo</h5>
+                                    <p>Destinar el sueldo anual complementario (aguinaldo) íntegramente al ahorro de inversión en vez de incorporarlo a los gastos corrientes.</p>
+                                </div>
+                            </div>
+                            <div class="strategy-item">
+                                <i data-lucide="umbrella"></i>
+                                <div>
+                                    <h5>Seguros de Retiro</h5>
+                                    <p>Contratar un seguro de retiro que descuente un monto fijo mensual de tu tarjeta. Al figurar como un "gasto", te obliga a ahorrar sistemáticamente para tu futuro sin sentir que estás sacrificando fondos voluntariamente.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quiz Section Pestaña 3 -->
+            <div class="quiz-container" id="quiz-30-50">
+                <div class="quiz-header">
+                    <i data-lucide="check-square"></i>
+                    <h3>Autoevaluación: Etapa de 30 a 50 años</h3>
+                </div>
+                <div class="quiz-progress">
+                    <div class="progress-bar" id="progress-quiz3" style="width: 0%;"></div>
+                </div>
+                <div class="quiz-questions">
+                    <!-- Question 1 -->
+                    <div class="question-block active-question" data-qindex="0">
+                        <span class="question-number">Pregunta 1 de 3</span>
+                        <h4 class="question-text">¿En qué consisten los denominados "Family Banks" y "Friends Banks" según el texto?</h4>
+                        <div class="options-list">
+                            <button class="option-btn" data-correct="false">A) Entidades bancarias internacionales para familias de altos ingresos.</button>
+                            <button class="option-btn" data-correct="true">B) Préstamos de dinero por parte de familiares o amigos (ej. para inmuebles).</button>
+                            <button class="option-btn" data-correct="false">C) Tarjetas de crédito compartidas entre grupos de amigos.</button>
+                            <button class="option-btn" data-correct="false">D) Subsidios estatales para compras de consumo masivo.</button>
+                        </div>
+                        <div class="question-feedback hidden"></div>
+                    </div>
+                    
+                    <!-- Question 2 -->
+                    <div class="question-block" data-qindex="1">
+                        <span class="question-number">Pregunta 2 de 3</span>
+                        <h4 class="question-text">¿Cuál es la postura expresada en el texto respecto a endeudarse a los 30 años para adquirir bienes duraderos?</h4>
+                        <div class="options-list">
+                            <button class="option-btn" data-correct="false">A) Es un peligro financiero que debe evitarse a toda costa.</button>
+                            <button class="option-btn" data-correct="false">B) Solo debe hacerse si se cuenta con el dinero en efectivo guardado.</button>
+                            <button class="option-btn" data-correct="true">C) Es la decisión correcta y una herramienta estratégica para vivir bien.</button>
+                            <button class="option-btn" data-correct="false">D) Solo es conveniente si no se tienen responsabilidades laborales.</button>
+                        </div>
+                        <div class="question-feedback hidden"></div>
+                    </div>
+
+                    <!-- Question 3 -->
+                    <div class="question-block" data-qindex="2">
+                        <span class="question-number">Pregunta 3 de 3</span>
+                        <h4 class="question-text">¿Cómo debe ejecutarse la regla de oro del ahorro sistemático?</h4>
+                        <div class="options-list">
+                            <button class="option-btn" data-correct="false">A) Guardando únicamente lo que sobra a fin de mes.</button>
+                            <button class="option-btn" data-correct="true">B) Ahorrando primero una parte del ingreso antes de realizar gastos.</button>
+                            <button class="option-btn" data-correct="false">C) Gastando todo el sueldo y ahorrando solo los regalos corporativos.</button>
+                            <button class="option-btn" data-correct="false">D) Ahorrando montos variables únicamente en meses de 31 días.</button>
+                        </div>
+                        <div class="question-feedback hidden"></div>
+                    </div>
+                </div>
+                <div class="quiz-footer">
+                    <span class="score-display">Puntaje: <span class="current-score">0</span>/3</span>
+                    <button class="quiz-nav-btn next-btn" id="next-btn-quiz3" disabled>Siguiente Pregunta <i data-lucide="chevron-right"></i></button>
+                    <button class="quiz-nav-btn restart-btn hidden" id="restart-btn-quiz3">Reiniciar Cuestionario <i data-lucide="refresh-cw"></i></button>
+                </div>
+                <div class="quiz-result-card hidden" id="result-quiz3">
+                    <div class="result-icon">
+                        <i data-lucide="award"></i>
+                    </div>
+                    <h4>¡Evaluación Completada!</h4>
+                    <p class="result-message"></p>
+                    <span class="final-score">Puntaje Final: 3 / 3</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- PESTAÑA 4: GLOSARIO FINANCIERO -->
+        <section id="tab-glosario" class="tab-section">
+            <div class="section-header">
+                <span class="stage-tag">Herramientas & Conceptos</span>
+                <h2>Glosario de Términos Financieros</h2>
+                <p class="section-intro">Familiarízate con las definiciones indispensables que Tomás Bulat detalla en su libro para comprender el funcionamiento del dinero y los bancos.</p>
+            </div>
+
+            <!-- Search and Filter in Glossary -->
+            <div class="glossary-search-container">
+                <div class="search-input-wrapper">
+                    <i data-lucide="search" class="search-icon"></i>
+                    <input type="text" id="glossarySearch" placeholder="Buscar concepto financiero (ej. fecha de cierre, ahorro)...">
+                </div>
+            </div>
+
+            <!-- Glossary Accordion -->
+            <div class="glossary-accordion" id="glossaryAccordion">
+                
+                <div class="accordion-item" data-term="bancarización">
+                    <button class="accordion-trigger" aria-expanded="false">
+                        <span>Bancarización</span>
+                        <i data-lucide="chevron-down" class="chevron"></i>
+                    </button>
+                    <div class="accordion-panel">
+                        <div class="panel-content">
+                            Proceso mediante el cual una persona accede a una cuenta bancaria y a los servicios del sistema financiero formal para gestionar sus ingresos, realizar transferencias y administrar sus pagos diarios.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item" data-term="historia crediticia">
+                    <button class="accordion-trigger" aria-expanded="false">
+                        <span>Historia crediticia</span>
+                        <i data-lucide="chevron-down" class="chevron"></i>
+                    </button>
+                    <div class="accordion-panel">
+                        <div class="panel-content">
+                            Registro del comportamiento financiero de una persona respecto al uso de financiamiento y deudas. Detalla los montos solicitados, las tarjetas activas y, fundamentalmente, la puntualidad y el cumplimiento en los pagos.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item" data-term="tarjeta de crédito">
+                    <button class="accordion-trigger" aria-expanded="false">
+                        <span>Tarjeta de crédito</span>
+                        <i data-lucide="chevron-down" class="chevron"></i>
+                    </button>
+                    <div class="accordion-panel">
+                        <div class="panel-content">
+                            Instrumento financiero que permite realizar compras y financiarlas, generando una deuda que debe liquidarse mensual y rutinariamente mediante el pago del resumen.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item" data-term="fecha de cierre">
+                    <button class="accordion-trigger" aria-expanded="false">
+                        <span>Fecha de cierre</span>
+                        <i data-lucide="chevron-down" class="chevron"></i>
+                    </button>
+                    <div class="accordion-panel">
+                        <div class="panel-content">
+                            El día específico del mes en el que la tarjeta consolida y detiene la suma de gastos que formarán parte del resumen de cuentas mensual. Las compras posteriores a esta fecha pasan al resumen del siguiente mes.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item" data-term="fecha de pago">
+                    <button class="accordion-trigger" aria-expanded="false">
+                        <span>Fecha de pago</span>
+                        <i data-lucide="chevron-down" class="chevron"></i>
+                    </button>
+                    <div class="accordion-panel">
+                        <div class="panel-content">
+                            Fecha límite establecida por la entidad financiera para cancelar la deuda reflejada en el resumen (ya sea el pago total o el pago mínimo) sin incurrir en intereses punitorios por mora.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item" data-term="débito automático">
+                    <button class="accordion-trigger" aria-expanded="false">
+                        <span>Débito automático</span>
+                        <i data-lucide="chevron-down" class="chevron"></i>
+                    </button>
+                    <div class="accordion-panel">
+                        <div class="panel-content">
+                            Modalidad de pago autorizada por el usuario en la que las obligaciones (facturas de servicios, resúmenes de tarjetas) se descuentan automáticamente de la cuenta bancaria en la fecha de vencimiento.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item" data-term="capacidad de pago">
+                    <button class="accordion-trigger" aria-expanded="false">
+                        <span>Capacidad de pago</span>
+                        <i data-lucide="chevron-down" class="chevron"></i>
+                    </button>
+                    <div class="accordion-panel">
+                        <div class="panel-content">
+                            Cantidad de ingresos líquidos y disponibles con los que cuenta una persona, una vez restados sus gastos básicos fijos, para poder hacer frente de manera solvente a obligaciones financieras o cuotas de deudas adicionales.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item" data-term="crédito hipotecario">
+                    <button class="accordion-trigger" aria-expanded="false">
+                        <span>Crédito hipotecario</span>
+                        <i data-lucide="chevron-down" class="chevron"></i>
+                    </button>
+                    <div class="accordion-panel">
+                        <div class="panel-content">
+                            Préstamo financiero a largo plazo otorgado por un banco y destinado a la adquisición de inmuebles (casa, departamento), en el cual el bien inmueble adquirido queda constituido como garantía de pago de la deuda.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item" data-term="ahorro sistemático">
+                    <button class="accordion-trigger" aria-expanded="false">
+                        <span>Ahorro sistemático</span>
+                        <i data-lucide="chevron-down" class="chevron"></i>
+                    </button>
+                    <div class="accordion-panel">
+                        <div class="panel-content">
+                            Hábito financiero de separar un porcentaje constante de los ingresos de manera planificada y predeterminada antes de realizar cualquier tipo de consumo general (Regla de Oro).
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item" data-term="bienes duraderos">
+                    <button class="accordion-trigger" aria-expanded="false">
+                        <span>Bienes duraderos</span>
+                        <i data-lucide="chevron-down" class="chevron"></i>
+                    </button>
+                    <div class="accordion-panel">
+                        <div class="panel-content">
+                            Artículos de consumo que no se agotan con su primer uso y poseen una vida útil prolongada (heladeras, lavarropas, tecnología). Tomás Bulat los cataloga como idóneos para financiar con cuotas a largo plazo.
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Quiz Section Pestaña 4 -->
+            <div class="quiz-container" id="quiz-glosario">
+                <div class="quiz-header">
+                    <i data-lucide="check-square"></i>
+                    <h3>Autoevaluación: Glosario Financiero</h3>
+                </div>
+                <div class="quiz-progress">
+                    <div class="progress-bar" id="progress-quiz4" style="width: 0%;"></div>
+                </div>
+                <div class="quiz-questions">
+                    <!-- Question 1 -->
+                    <div class="question-block active-question" data-qindex="0">
+                        <span class="question-number">Pregunta 1 de 2</span>
+                        <h4 class="question-text">¿Cómo define el glosario el concepto de "Capacidad de pago"?</h4>
+                        <div class="options-list">
+                            <button class="option-btn" data-correct="false">A) El dinero gastado en entretenimiento a lo largo de un año.</button>
+                            <button class="option-btn" data-correct="true">B) La cantidad de ingresos disponibles para hacer frente a obligaciones financieras.</button>
+                            <button class="option-btn" data-correct="false">C) El total de préstamos rechazados por el sistema bancario.</button>
+                            <button class="option-btn" data-correct="false">D) El límite total de compra otorgado por una tarjeta de débito.</button>
+                        </div>
+                        <div class="question-feedback hidden"></div>
+                    </div>
+                    
+                    <!-- Question 2 -->
+                    <div class="question-block" data-qindex="1">
+                        <span class="question-number">Pregunta 2 de 2</span>
+                        <h4 class="question-text">¿Qué define la "Fecha de cierre" de una tarjeta de crédito?</h4>
+                        <div class="options-list">
+                            <button class="option-btn" data-correct="false">A) El día en que vence la factura de los servicios públicos.</button>
+                            <button class="option-btn" data-correct="false">B) La fecha límite para cancelar la deuda sin intereses.</button>
+                            <button class="option-btn" data-correct="true">C) El día del mes en el que se consolidan los gastos para el resumen.</button>
+                            <button class="option-btn" data-correct="false">D) El momento en que la tarjeta caduca y debe renovarse.</button>
+                        </div>
+                        <div class="question-feedback hidden"></div>
+                    </div>
+                </div>
+                <div class="quiz-footer">
+                    <span class="score-display">Puntaje: <span class="current-score">0</span>/2</span>
+                    <button class="quiz-nav-btn next-btn" id="next-btn-quiz4" disabled>Siguiente Pregunta <i data-lucide="chevron-right"></i></button>
+                    <button class="quiz-nav-btn restart-btn hidden" id="restart-btn-quiz4">Reiniciar Cuestionario <i data-lucide="refresh-cw"></i></button>
+                </div>
+                <div class="quiz-result-card hidden" id="result-quiz4">
+                    <div class="result-icon">
+                        <i data-lucide="award"></i>
+                    </div>
+                    <h4>¡Evaluación Completada!</h4>
+                    <p class="result-message"></p>
+                    <span class="final-score">Puntaje Final: 2 / 2</span>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+        <div class="footer-container">
+            <p>&copy; 2026 Guía Educativa basada en <em>La economía de tu vida</em> de Tomás Bulat.</p>
+            <p>Diseño premium para divulgación y educación financiera interactiva.</p>
+        </div>
+    </footer>
+
+    <!-- App JavaScript -->
+    <script src="app.js"></script>
+</body>
+</html>
