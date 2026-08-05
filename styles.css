@@ -2413,3 +2413,168 @@ body {
     border: 1px solid var(--border-color);
 }
 
+/* ==========================================
+   PODIUM OF TOP 3 STUDENTS STYLES
+   ========================================== */
+.podium-container-wrapper {
+    margin: 32px 0;
+    padding: 24px;
+    background: var(--bg-secondary);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-color);
+}
+
+.podium-title {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-primary);
+}
+
+.podium-title i {
+    color: #fbbf24; /* Gold trophy color */
+}
+
+.podium-layout {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr 1fr;
+    align-items: end;
+    gap: 16px;
+    max-width: 600px;
+    margin: 0 auto;
+    padding-top: 20px;
+}
+
+.podium-spot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.podium-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 18px;
+    margin-bottom: 8px;
+    color: #ffffff;
+    position: relative;
+    box-shadow: var(--shadow-sm);
+}
+
+.podium-crown {
+    position: absolute;
+    top: -14px;
+    width: 20px;
+    height: 20px;
+    color: #fbbf24;
+    animation: bounceCrown 2s infinite ease-in-out;
+}
+
+@keyframes bounceCrown {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-4px) rotate(3deg); }
+}
+
+.podium-spot-first .podium-avatar {
+    width: 56px;
+    height: 56px;
+    font-size: 22px;
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    border: 3px solid #fef3c7;
+    box-shadow: 0 0 15px rgba(245, 158, 11, 0.4);
+}
+
+.podium-spot-second .podium-avatar {
+    background: linear-gradient(135deg, #94a3b8, #64748b);
+    border: 3px solid #f1f5f9;
+}
+
+.podium-spot-third .podium-avatar {
+    background: linear-gradient(135deg, #b45309, #78350f);
+    border: 3px solid #ffedd5;
+}
+
+.podium-name {
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--text-primary);
+    margin-bottom: 2px;
+    word-break: break-word;
+    max-width: 140px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.podium-email {
+    font-size: 11px;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+    max-width: 130px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.podium-score {
+    font-weight: 800;
+    font-size: 15px;
+    color: var(--color-primary);
+}
+
+.podium-pct {
+    font-size: 11px;
+    color: var(--text-secondary);
+    margin-bottom: 12px;
+}
+
+.podium-pedestal {
+    width: 100%;
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    color: #ffffff;
+    font-size: 24px;
+    box-shadow: var(--shadow-sm) inset;
+}
+
+.podium-spot-first .podium-pedestal {
+    height: 100px;
+    background: linear-gradient(180deg, #f59e0b, #d97706);
+}
+
+.podium-spot-second .podium-pedestal {
+    height: 70px;
+    background: linear-gradient(180deg, #64748b, #475569);
+}
+
+.podium-spot-third .podium-pedestal {
+    height: 50px;
+    background: linear-gradient(180deg, #78350f, #451a03);
+}
+
+@media (max-width: 500px) {
+    .podium-layout {
+        gap: 8px;
+    }
+    .podium-name {
+        font-size: 12px;
+    }
+    .podium-email {
+        max-width: 90px;
+    }
+}
+
+

@@ -678,6 +678,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const exportCsvBtn = document.getElementById('exportCsvBtn');
     const resetDatabaseBtn = document.getElementById('resetDatabaseBtn');
 
+    // Helper to format email into Name and Last Name
+    function formatStudentName(email) {
+        const namePart = email.split('@')[0];
+        if (namePart.includes('.')) {
+            return namePart.split('.')
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(' ');
+        }
+        return namePart.charAt(0).toUpperCase() + namePart.slice(1);
+    }
+
     function refreshDocenteDashboard() {
         const students = DatabaseManager.getStudents();
         const tableBody = document.getElementById('studentsTableBody');
@@ -705,13 +716,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 const totalScore = (student.scores.quiz2 || 0) + (student.scores.quiz3 || 0) + (student.scores.quizGlosario || 0);
                 const totalMax = 8;
                 
+                // Formatted name
+                const formattedName = formatStudentName(student.email);
+                
                 // Formatted date
                 const dateStr = student.lastActive ? new Date(student.lastActive).toLocaleString('es-AR', {
                     day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
                 }) : 'Sin actividad';
                 
                 tr.innerHTML = `
-                    <td><strong>${student.email}</strong></td>
+                    <td><strong>${formattedName}</strong> <span class="student-email-row" style="font-size: 11px; color: var(--text-secondary); display: block;">${student.email}</span></td>
                     <td>${q2Badge}</td>
                     <td>${q3Badge}</td>
                     <td>${qgBadge}</td>
@@ -725,6 +739,9 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Update stats
         compileDocenteStats(students);
+
+        // Update podium!
+        refreshPodium(students);
     }
 
     function getScoreBadgeHtml(score, max) {
@@ -772,6 +789,116 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('stat-average-score').textContent = `${avgScorePercent}%`;
     }
 
+    // Refresh dynamic podium with top 3 students
+    function refreshPodium(students) {
+        const podiumLayout = document.getElementById('podiumLayout');
+        if (!podiumLayout) return;
+
+        // Map and filter active students who completed at least one quiz
+        const scoredStudents = students.map(student => {
+            let takenCount = 0;
+            let scoreSum = 0;
+            let maxPossible = 0;
+            
+            if (student.scores.quiz2 !== null) {
+                takenCount++;
+                scoreSum += student.scores.quiz2;
+                maxPossible += 3;
+            }
+            if (student.scores.quiz3 !== null) {
+                takenCount++;
+                scoreSum += student.scores.quiz3;
+                maxPossible += 3;
+            }
+            if (student.scores.quizGlosario !== null) {
+                takenCount++;
+                scoreSum += student.scores.quizGlosario;
+                maxPossible += 2;
+            }
+            
+            const pct = maxPossible > 0 ? (scoreSum / maxPossible) * 100 : 0;
+            
+            return {
+                ...student,
+                totalScore: (student.scores.quiz2 || 0) + (student.scores.quiz3 || 0) + (student.scores.quizGlosario || 0),
+                hasTaken: takenCount > 0,
+                percentage: Math.round(pct)
+            };
+        }).filter(s => s.hasTaken);
+
+        // Sort descending by percentage, then by total score, then alphabetically
+        scoredStudents.sort((a, b) => {
+            if (b.percentage !== a.percentage) {
+                return b.percentage - a.percentage;
+            }
+            if (b.totalScore !== a.totalScore) {
+                return b.totalScore - a.totalScore;
+            }
+            return a.email.localeCompare(b.email);
+        });
+
+        // Get Top 3
+        const top3 = scoredStudents.slice(0, 3);
+
+        if (top3.length === 0) {
+            podiumLayout.innerHTML = `
+                <div style="grid-column: span 3; text-align: center; padding: 24px 0; color: var(--text-secondary);">
+                    <i data-lucide="info" style="width: 24px; height: 24px; margin-bottom: 8px; color: var(--color-primary); display: inline-block;"></i>
+                    <p>Aún no hay calificaciones registradas para armar el podio escolar.</p>
+                </div>
+            `;
+            lucide.createIcons();
+            return;
+        }
+
+        let layoutHtml = '';
+        const spot2 = top3[1];
+        const spot1 = top3[0];
+        const spot3 = top3[2];
+
+        // 2nd Place (Left)
+        if (spot2) {
+            layoutHtml += renderPodiumSpotHtml(spot2, 'second', '2');
+        } else {
+            layoutHtml += '<div class="podium-spot-empty"></div>';
+        }
+
+        // 1st Place (Center)
+        if (spot1) {
+            layoutHtml += renderPodiumSpotHtml(spot1, 'first', '1');
+        }
+
+        // 3rd Place (Right)
+        if (spot3) {
+            layoutHtml += renderPodiumSpotHtml(spot3, 'third', '3');
+        } else {
+            layoutHtml += '<div class="podium-spot-empty"></div>';
+        }
+
+        podiumLayout.innerHTML = layoutHtml;
+        lucide.createIcons();
+    }
+
+    function renderPodiumSpotHtml(student, rankClass, number) {
+        const formattedName = formatStudentName(student.email);
+        const initial = student.email.charAt(0).toUpperCase();
+        const crown = rankClass === 'first' ? '<i data-lucide="crown" class="podium-crown"></i>' : '';
+        
+        return `
+            <div class="podium-spot podium-spot-${rankClass}">
+                <div class="podium-avatar">
+                    ${crown}
+                    <span>${initial}</span>
+                </div>
+                <div class="podium-name" title="${formattedName}">${formattedName}</div>
+                <div class="podium-email" title="${student.email}">${student.email}</div>
+                <div class="podium-score">${student.totalScore} / 8 pts</div>
+                <div class="podium-pct">${student.percentage}% aciertos</div>
+                <div class="podium-pedestal">${number}</div>
+            </div>
+        `;
+    }
+
     // Search input event
     studentSearch.addEventListener('input', refreshDocenteDashboard);
 
@@ -784,7 +911,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         let csvContent = "data:text/csv;charset=utf-8,";
-        csvContent += "Estudiante,Etapa 20-30 (max 3),Etapa 30-50 (max 3),Glosario (max 2),Total (max 8),Ultima Actividad\n";
+        csvContent += "Estudiante,Nombre,Etapa 20-30 (max 3),Etapa 30-50 (max 3),Glosario (max 2),Total (max 8),Ultima Actividad\n";
         
         students.forEach(student => {
             const q2 = student.scores.quiz2 !== null ? student.scores.quiz2 : "";
@@ -792,8 +919,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const qg = student.scores.quizGlosario !== null ? student.scores.quizGlosario : "";
             const total = (student.scores.quiz2 || 0) + (student.scores.quiz3 || 0) + (student.scores.quizGlosario || 0);
             const lastActive = student.lastActive ? new Date(student.lastActive).toISOString() : "";
+            const name = formatStudentName(student.email);
             
-            csvContent += `"${student.email}",${q2},${q3},${qg},${total},"${lastActive}"\n`;
+            csvContent += `"${student.email}","${name}",${q2},${q3},${qg},${total},"${lastActive}"\n`;
         });
 
         const encodedUri = encodeURI(csvContent);
